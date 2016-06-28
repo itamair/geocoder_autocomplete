@@ -1,13 +1,10 @@
 <?php
-/**
- * @file
- * Contains /Drupal/geocoder_autocomplete/GeocoderJsonConsumer.
- */
 
 namespace Drupal\geocoder_autocomplete;
 
-use GuzzleHttp\ClientInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Component\Utility\Html;
+use GuzzleHttp\ClientInterface;
 
 /**
  * Defines the GeocoderJsonConsumer service, for return parse GeoJson.
@@ -30,8 +27,16 @@ class GeocoderJsonConsumer {
 
   /**
    * Service constructor.
+   *
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   The http client.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(ClientInterface $http_client, LanguageManagerInterface $language_manager) {
+  public function __construct(
+      ClientInterface $http_client,
+      LanguageManagerInterface $language_manager
+  ) {
     $this->httpClient = $http_client;
     $this->languageManager = $language_manager;
   }
@@ -67,8 +72,10 @@ class GeocoderJsonConsumer {
         foreach ($data->results as $result) {
           if (!empty($result->formatted_address)) {
             $formatted_address = $result->formatted_address;
-            // Names containing commas or quotes must be wrapped in quotes.
-            $matches[] = array('value' => $formatted_address, 'label' => $formatted_address);
+            $matches[] = array(
+              'value' => Html::escape($formatted_address),
+              'label' => Html::escape($formatted_address),
+            );
           }
         }
 
